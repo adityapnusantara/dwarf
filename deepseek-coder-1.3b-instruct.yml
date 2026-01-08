@@ -24,11 +24,11 @@ bnb_4bit_compute_dtype: bfloat16
 bnb_4bit_use_double_quant: true
 
 datasets:
-  - path: /workspace/finetune/dwarf/formatted_synthetic_sql.jsonl
+  - path: ./formatted_synthetic_sql.jsonl
     type: chat_template  # expects {"messages":[{"role":"user","content":...},{"role":"assistant","content":...}]}
 
 val_set_size: 0.02
-output_dir: /workspace/finetune/outputs/deepseek-coder-1.3b-instruct-lora
+output_dir: ./outputs/deepseek-coder-1.3b-instruct-lora
 
 sequence_len: 2048
 sample_packing: true
