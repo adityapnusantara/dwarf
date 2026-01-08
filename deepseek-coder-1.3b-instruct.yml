@@ -1,0 +1,57 @@
+---
+# Axolotl config to fine-tune deepseek-ai/deepseek-coder-1.3b-instruct with QLoRA.
+# Update dataset paths and hyperparameters to your setup before running.
+
+base_model: deepseek-ai/deepseek-coder-1.3b-instruct
+trust_remote_code: true
+
+adapter: lora
+lora_r: 64
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+load_in_4bit: true
+bnb_4bit_quant_type: nf4
+bnb_4bit_compute_dtype: bfloat16
+bnb_4bit_use_double_quant: true
+
+datasets:
+  - path: /workspace/finetune/dwarf/formatted_synthetic_sql.jsonl
+    type: chat_template  # expects {"messages":[{"role":"user","content":...},{"role":"assistant","content":...}]}
+
+val_set_size: 0.02
+output_dir: /workspace/finetune/outputs/deepseek-coder-1.3b-instruct-lora
+
+sequence_len: 2048
+sample_packing: true
+pad_to_sequence_len: true
+train_on_inputs: false
+
+num_epochs: 3
+micro_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+weight_decay: 0.01
+optimizer: adamw_bnb_8bit
+lr_scheduler: cosine
+warmup_steps: 100
+
+logging_steps: 10
+save_steps: 500
+eval_steps: 500
+save_total_limit: 3
+
+gradient_checkpointing: true
+flash_attention: true  # set to false if flash-attn is not installed
+torch_dtype: bfloat16
+seed: 42
+
+chat_template: tokenizer_default
