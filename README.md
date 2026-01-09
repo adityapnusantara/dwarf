@@ -19,6 +19,10 @@ Generated at runtime (gitignored): `outputs/`, `last_run_prepared/`, and any reg
 - `axolotl` CLI available.
 - HF auth if required (`HF_TOKEN`, `HF_HOME`).
 - Optional: flash-attn if you keep `flash_attention: true` in the config.
+- Ensure scripts are executable (run once if needed):
+  ```
+  /bin/bash -lc "chmod +x ./scripts/train.sh ./scripts/prepare_data.py"
+  ```
 
 ## Quick start
 ```bash
@@ -51,3 +55,23 @@ Each row:
 ## Outputs
 - Checkpoints/merged model: `outputs/`
 - Prepared dataset cache: `last_run_prepared/`
+
+## Example run output
+```
+root@27f8d2a78cc8:/workspace/finetune/dwarf# ./scripts/train.sh
+[dwarf] Preparing data -> /workspace/finetune/dwarf/data/train.jsonl (split=train, limit=0)
+Wrote 100000 rows to /workspace/finetune/dwarf/data/train.jsonl
+[dwarf] Training...
+
+     #@@ #@@      @@# @@#
+    @@  @@          @@  @@           =@@#                               @@                 #@    =@@#.
+    @@    #@@@@@@@@@    @@           #@#@=                              @@                 #@     .=@@
+      #@@@@@@@@@@@@@@@@@            =@# @#     ##=     ##    =####=+    @@      =#####+  =#@@###.   @@
+    @@@@@@@@@@/  +@@/  +@@          #@  =@=     #@=   @@   =@#+  +#@#   @@    =@#+  +#@#   #@.      @@
+    @@@@@@@@@@  ##@@  ##@@         =@#   @#      =@# @#    @@      @@   @@    @@      #@   #@       @@
+     @@@@@@@@@@@@@@@@@@@@          #@=+++#@=      =@@#     @@      @@   @@    @@      #@   #@       @@
+                                  =@#=====@@     =@# @#    @@      @@   @@    @@      #@   #@       @@
+    @@@@@@@@@@@@@@@@  @@@@        #@      #@=   #@=  +@@   #@#    =@#   @@.   =@#    =@#   #@.      @@
+                                 =@#       @#  #@=     #@   =#@@@@#=    +#@@=  +#@@@@#=    .##@@+   @@
+    @@@@  @@@@@@@@@@@@@@@@
+```
