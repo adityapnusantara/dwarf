@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Utility to load gretelai/synthetic_text_to_sql and format rows into chat-style prompts.
+Prepare gretelai/synthetic_text_to_sql as chat_template data.
 
-For each example we produce:
-- system: table schema from sql_context
+- system: schema from sql_context with explicit SQL assistant instruction
 - user: natural language request from sql_prompt
 - assistant: SQL query from sql
 """
@@ -38,12 +37,17 @@ def format_example(example: dict) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Format gretelai/synthetic_text_to_sql as chat prompts.")
     parser.add_argument("--split", default="train", help="Dataset split to load (default: train).")
-    parser.add_argument("--limit", type=int, default=10, help="Limit number of rows (default: 10; 0 disables).")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=200,
+        help="Limit number of rows (default: 200; 0 disables and loads full split).",
+    )
     parser.add_argument(
         "--out",
         type=Path,
-        default=Path("formatted_synthetic_sql.jsonl"),
-        help="Output JSONL path (default: formatted_synthetic_sql.jsonl).",
+        default=Path("data/train.jsonl"),
+        help="Output JSONL path (default: data/train_sample.jsonl).",
     )
     args = parser.parse_args()
 
@@ -51,6 +55,7 @@ def main() -> None:
     if args.limit and args.limit > 0:
         ds = ds.select(range(min(args.limit, len(ds))))
 
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", encoding="utf-8") as f:
         for row in ds:
             formatted = format_example(row)
