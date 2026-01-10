@@ -1,34 +1,47 @@
-# Dwarf: DeepSeek Coder 1.3B Finetune with Axolotl
+# Dwarf: DeepSeek Coder SQL QLoRA (Axolotl)
 
-Self-contained recipe to QLoRA-finetune `deepseek-ai/deepseek-coder-1.3b-instruct` on the synthetic Text-to-SQL dataset.
+QLoRA fine-tune of `deepseek-ai/deepseek-coder-1.3b-instruct` on synthetic Text-to-SQL, with a tidier layout.
 
-## Files
-- `deepseek-coder-1.3b-instruct.yml` — Axolotl training config (relative paths, chat_template dataset).
-- `run_finetune.sh` — one-shot pipeline: generate dataset → train → merge LoRA.
-- `load_synthetic_sql.py` — fetch and format `gretelai/synthetic_text_to_sql` into chat messages.
-- `formatted_synthetic_sql.jsonl` — generated dataset (gitignored).
+## Structure
+```
+├── README.md
+├── scripts/
+│   ├── prepare_data.py      # download + format gretelai/synthetic_text_to_sql
+│   └── train.sh             # prepare -> train -> merge LoRA
+├── configs/
+│   └── deepseek_sql_qlora.yaml
+└── data/
+    └── train_sample.jsonl   # small sample (chat_template)
+```
+Generated at runtime (gitignored): `outputs/`, `last_run_prepared/`, and any regenerated JSONL.
 
 ## Prereqs
-- Axolotl installed and on PATH (`axolotl` CLI).
-- HF auth if the model/dataset requires it (`HF_TOKEN`/`HF_HOME` as needed).
+- `axolotl` CLI available.
+- HF auth if required (`HF_TOKEN`, `HF_HOME`).
 - Optional: flash-attn if you keep `flash_attention: true` in the config.
+- Ensure scripts are executable (run once if needed):
+  ```
+  /bin/bash -lc "chmod +x ./scripts/train.sh ./scripts/prepare_data.py"
+  ```
 
 ## Quick start
 ```bash
 cd "$(dirname "$0")"
-./run_finetune.sh
+./scripts/train.sh
 ```
-This pulls the full `train` split, trains, then merges LoRA.
+Defaults: split=`train`, limit=`200`, config=`configs/deepseek_sql_qlora.yaml`, data output=`data/train_sample.jsonl`.
 
-## Customizing runs
-- Limit rows: `LIMIT=500 ./run_finetune.sh`
-- Choose split: `SPLIT=validation ./run_finetune.sh`
-- Change dataset path: `DATA=/tmp/sql.jsonl ./run_finetune.sh`
-- Change config: `CONFIG=/path/to/your.yml ./run_finetune.sh`
-- Pass extra Axolotl args: `./run_finetune.sh --max_steps 200`
+## Customization
+- Limit rows: `LIMIT=500 ./scripts/train.sh`
+- Full split: `LIMIT=0 ./scripts/train.sh`
+- Choose split: `SPLIT=validation ./scripts/train.sh`
+- Custom dataset path: `DATA=/tmp/sql.jsonl ./scripts/train.sh`
+- Custom config: `CONFIG=/path/to/config.yaml ./scripts/train.sh`
+- Skip merge step: `SKIP_MERGE=1 ./scripts/train.sh`
+- Extra Axolotl args: `./scripts/train.sh --max_steps 200 --save_steps 100`
 
-## Dataset format (chat_template)
-Each row in `formatted_synthetic_sql.jsonl`:
+## Data format (chat_template)
+Each row:
 ```json
 {
   "messages": [
@@ -42,3 +55,23 @@ Each row in `formatted_synthetic_sql.jsonl`:
 ## Outputs
 - Checkpoints/merged model: `outputs/`
 - Prepared dataset cache: `last_run_prepared/`
+
+## Example run output
+```
+root@27f8d2a78cc8:/workspace/finetune/dwarf# ./scripts/train.sh
+[dwarf] Preparing data -> /workspace/finetune/dwarf/data/train.jsonl (split=train, limit=0)
+Wrote 100000 rows to /workspace/finetune/dwarf/data/train.jsonl
+[dwarf] Training...
+
+     #@@ #@@      @@# @@#
+    @@  @@          @@  @@           =@@#                               @@                 #@    =@@#.
+    @@    #@@@@@@@@@    @@           #@#@=                              @@                 #@     .=@@
+      #@@@@@@@@@@@@@@@@@            =@# @#     ##=     ##    =####=+    @@      =#####+  =#@@###.   @@
+    @@@@@@@@@@/  +@@/  +@@          #@  =@=     #@=   @@   =@#+  +#@#   @@    =@#+  +#@#   #@.      @@
+    @@@@@@@@@@  ##@@  ##@@         =@#   @#      =@# @#    @@      @@   @@    @@      #@   #@       @@
+     @@@@@@@@@@@@@@@@@@@@          #@=+++#@=      =@@#     @@      @@   @@    @@      #@   #@       @@
+                                  =@#=====@@     =@# @#    @@      @@   @@    @@      #@   #@       @@
+    @@@@@@@@@@@@@@@@  @@@@        #@      #@=   #@=  +@@   #@#    =@#   @@.   =@#    =@#   #@.      @@
+                                 =@#       @#  #@=     #@   =#@@@@#=    +#@@=  +#@@@@#=    .##@@+   @@
+    @@@@  @@@@@@@@@@@@@@@@
+```
