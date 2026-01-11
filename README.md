@@ -11,16 +11,21 @@ QLoRA fine-tune on synthetic Text-to-SQL, with a tidier layout.
 │   ├── gemma-3-1b-qlora.yml
 │   └── gemma-3-1b-qlora-e-2.yml
 ├── scripts/
-│   ├── prepare_data.py      # download + format gretelai/synthetic_text_to_sql
-│   └── train.sh             # prepare -> train -> merge LoRA
+│   ├── prepare_data.py        # download + format gretelai/synthetic_text_to_sql
+│   ├── train.sh               # prepare -> train -> merge LoRA
+│   └── schema_converter.py    # trim LangChain SQL schema text into promptable DDL+inserts
 ├── data/
-│   └── train.jsonl   # fine-tuning data (chat_template)
-├── database/
-│   └── __movie_information_and_analysis__.sqlite
+│   ├── train.jsonl            # fine-tuning data (chat_template)
+│   └── test.jsonl             # eval slice
+├── database/                  # synthetic SQLite schemas (one .sqlite per scenario)
+│   └── <domain_name>/*.sqlite
 ├── notebooks/
-│   └── chain_text2sql.ipynb # Pipeline to process text into SQL from user question
-├── outputs/                 # generated (checkpoints/merged)
-└── last_run_prepared/       # generated (prepared dataset cache)
+│   └── chain_text2sql.ipynb   # pipeline to process text into SQL from user question
+└── outputs/
+    ├── deepseek-sql-qlora/
+    ├── gemma-3-1b-sql-qlora/
+    └── gemma-3-1b-sql-qlora-e-2/
+
 ```
 
 ## Install & setup
