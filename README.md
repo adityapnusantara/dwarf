@@ -1,35 +1,43 @@
-# Dwarf: DeepSeek Coder SQL QLoRA (Axolotl)
+# Dwarf: Text2SQL Experiments
 
-QLoRA fine-tune of `deepseek-ai/deepseek-coder-1.3b-instruct` on synthetic Text-to-SQL, with a tidier layout.
+QLoRA fine-tune on synthetic Text-to-SQL, with a tidier layout.
 
 ## Structure
 ```
 ├── README.md
+├── requirements.txt
+├── configs/
+│   ├── deepseek_sql_qlora.yaml
+│   ├── gemma-3-1b-qlora.yml
+│   └── gemma-3-1b-qlora-e-2.yml
 ├── scripts/
 │   ├── prepare_data.py      # download + format gretelai/synthetic_text_to_sql
 │   └── train.sh             # prepare -> train -> merge LoRA
-├── configs/
-│   └── deepseek_sql_qlora.yaml
-└── data/
-    └── train_sample.jsonl   # small sample (chat_template)
+├── data/
+│   └── train.jsonl   # fine-tuning data (chat_template)
+├── database/
+│   └── __movie_information_and_analysis__.sqlite
+├── notebooks/
+│   └── chain_text2sql.ipynb # Pipeline to process text into SQL from user question
+├── outputs/                 # generated (checkpoints/merged)
+└── last_run_prepared/       # generated (prepared dataset cache)
 ```
-Generated at runtime (gitignored): `outputs/`, `last_run_prepared/`, and any regenerated JSONL.
 
-## Prereqs
-- `axolotl` CLI available.
-- HF auth if required (`HF_TOKEN`, `HF_HOME`).
-- Optional: flash-attn if you keep `flash_attention: true` in the config.
-- Ensure scripts are executable (run once if needed):
-  ```
-  /bin/bash -lc "chmod +x ./scripts/train.sh ./scripts/prepare_data.py"
-  ```
-
-## Quick start
-```bash
-cd "$(dirname "$0")"
-./scripts/train.sh
-```
-Defaults: split=`train`, limit=`200`, config=`configs/deepseek_sql_qlora.yaml`, data output=`data/train_sample.jsonl`.
+## Install & setup
+1) Start Axolotl container (GPU required):
+   ```bash
+   docker run --gpus '"all"' -it axolotlai/axolotl:main-latest
+   ```
+2) Inside the container, clone this repo:
+   ```bash
+   git clone https://github.com/adityapnusantara/dwarf
+   cd dwarf
+   ```
+3) Make scripts executable, then launch training:
+   ```bash
+   /bin/bash -lc "chmod +x ./scripts/train.sh ./scripts/prepare_data.py"
+   HF_TOKEN=<HF_TOKEN> ./scripts/train.sh
+   ```
 
 ## Customization
 - Limit rows: `LIMIT=500 ./scripts/train.sh`
@@ -45,7 +53,6 @@ Each row:
 ```json
 {
   "messages": [
-    {"role": "system", "content": "You are an expert SQL assistant...Table schema:\n..."},
     {"role": "user", "content": "<natural language request>"},
     {"role": "assistant", "content": "<SQL query>"}
   ]

@@ -34,7 +34,7 @@ sample_packing: true
 pad_to_sequence_len: true
 train_on_inputs: false
 
-num_epochs: 2
+num_epochs: 5
 micro_batch_size: 8
 gradient_accumulation_steps: 4
 learning_rate: 2.0e-4
