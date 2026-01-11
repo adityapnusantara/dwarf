@@ -164,6 +164,7 @@ def evaluate(
         # print(f"Raw SQL:\n{raw_sql}\n")
         parsed_sql = post_process_sql(raw_sql)
         # print(f"Parsed SQL:\n{parsed_sql}\n")
+        # print(f"Ground Truth SQL:\n{example.sql}\n")
 
         if not parsed_sql:
             fail += 1
