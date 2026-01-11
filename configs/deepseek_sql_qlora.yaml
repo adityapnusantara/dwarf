@@ -5,7 +5,7 @@ base_model: deepseek-ai/deepseek-coder-1.3b-instruct
 trust_remote_code: true
 
 adapter: lora
-lora_r: 64
+lora_r: 128
 lora_alpha: 16
 lora_dropout: 0.05
 lora_target_modules:
@@ -34,8 +34,8 @@ sample_packing: true
 pad_to_sequence_len: true
 train_on_inputs: false
 
-num_epochs: 1
-micro_batch_size: 4
+num_epochs: 2
+micro_batch_size: 8
 gradient_accumulation_steps: 4
 learning_rate: 2.0e-4
 weight_decay: 0.01
@@ -55,3 +55,6 @@ torch_dtype: bfloat16
 seed: 42
 
 chat_template: tokenizer_default
+
+special_tokens:
+  eos_token: "<|EOT|>"

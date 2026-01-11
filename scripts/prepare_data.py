@@ -17,17 +17,15 @@ from datasets import load_dataset
 
 
 def format_example(example: dict) -> dict:
-    system = (
-        "You are an expert SQL assistant. "
-        "Use ONLY the provided table schema to write a correct SQL query. "
-        "Return valid SQL without explanations.\n"
-        f"Table schema:\n{example['sql_context']}"
+    user = (
+        "You are an expert SQL assistant. Use ONLY the provided table schema to write "
+        "a correct SQL query. Return valid SQL without explanations.\n"
+        f"Table schema:\n{example['sql_context']}\n"
+        f"Question: {example['sql_prompt']}"
     ).strip()
-    user = example["sql_prompt"]
     assistant = example["sql"]
     return {
         "messages": [
-            {"role": "system", "content": system},
             {"role": "user", "content": user},
             {"role": "assistant", "content": assistant},
         ]
