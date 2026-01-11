@@ -73,7 +73,7 @@ QLoRA fine-tune on synthetic Text-to-SQL, with a tidier layout.
 
    ```
 
-  Training
+   Training
    - Limit rows: `LIMIT=500 ./scripts/train.sh`
    - Full split: `LIMIT=0 ./scripts/train.sh`
    - Choose split: `SPLIT=validation ./scripts/train.sh`
