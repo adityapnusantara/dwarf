@@ -15,15 +15,47 @@ from pathlib import Path
 
 from datasets import load_dataset
 
+PROMPT_TEXT_TO_SQL = '''You are an expert SQL assistant. Use ONLY the provided table schema to write a correct SQL query. Return valid SQL without explanations.
+Table schema:
+{table_info}
+Question: {input}
+Output format enclose the generated SQL query in a code block::
+```
+-- Your SQL query
+```
+'''
+
+# PROMPT_TEXT_TO_SQL = '''Task Overview:
+# You are a data science expert. Below, you are provided with a database schema and a natural language question. Your task is to understand the schema and generate a valid SQL query to answer the question.
+
+# Database Engine:
+# SQLite
+
+# Database Schema:
+# {table_info}
+# This schema describes the database's structure, including tables, columns, primary keys, foreign keys, and any relevant relationships or constraints.
+
+# Question:
+# {input}
+
+# Instructions:
+# - Make sure you only output the information that is asked in the question. If the question asks for a specific column, make sure to only include that column in the SELECT clause, nothing more.
+# - The generated query should return all of the information asked in the question without any missing or extra information.
+# - Before generating the final SQL query, please think through the steps of how to write the query.
+
+# Output Format:
+# In your answer, please enclose the generated SQL query in a code block:
+# ```
+# -- Your SQL query
+# ```
+# '''
 
 def format_example(example: dict) -> dict:
-    user = (
-        "You are an expert SQL assistant. Use ONLY the provided table schema to write "
-        "a correct SQL query. Return valid SQL without explanations.\n"
-        f"Table schema:\n{example['sql_context']}\n"
-        f"Question: {example['sql_prompt']}"
+    user = PROMPT_TEXT_TO_SQL.format(
+        table_info=example["sql_context"],
+        input=example["sql_prompt"],
     ).strip()
-    assistant = example["sql"]
+    assistant = f"```{example['sql']}```"
     return {
         "messages": [
             {"role": "user", "content": user},

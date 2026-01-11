@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONFIG="${CONFIG:-${ROOT}/configs/gemma-3-1b-qlora.yml`}"
+CONFIG="${CONFIG:-${ROOT}/configs/gemma-3-1b-qlora.yml}"
 DATA="${DATA:-${ROOT}/data/train.jsonl}"
 SPLIT="${SPLIT:-train}"
 LIMIT="${LIMIT:-0}"  # 0 = no limit

@@ -16,7 +16,7 @@ datasets:
   - path: ./data/train.jsonl
     type: chat_template  # {"messages":[{"role":"system"|"user"|"assistant","content":...},...]}
 
-val_set_size: 0.0
+val_set_size: 0.2
 output_dir: ./outputs/gemma-3-1b-sql-qlora-e-2
 
 adapter: qlora
