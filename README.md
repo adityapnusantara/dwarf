@@ -73,14 +73,14 @@ QLoRA fine-tune on synthetic Text-to-SQL, with a tidier layout.
 
    ```
 
-## Training
-- Limit rows: `LIMIT=500 ./scripts/train.sh`
-- Full split: `LIMIT=0 ./scripts/train.sh`
-- Choose split: `SPLIT=validation ./scripts/train.sh`
-- Custom dataset path: `DATA=/tmp/sql.jsonl ./scripts/train.sh`
-- Custom config: `CONFIG=/path/to/config.yaml ./scripts/train.sh`
-- Skip merge step: `SKIP_MERGE=1 ./scripts/train.sh`
-- Extra Axolotl args: `./scripts/train.sh --max_steps 200 --save_steps 100`
+  Training
+   - Limit rows: `LIMIT=500 ./scripts/train.sh`
+   - Full split: `LIMIT=0 ./scripts/train.sh`
+   - Choose split: `SPLIT=validation ./scripts/train.sh`
+   - Custom dataset path: `DATA=/tmp/sql.jsonl ./scripts/train.sh`
+   - Custom config: `CONFIG=/path/to/config.yaml ./scripts/train.sh`
+   - Skip merge step: `SKIP_MERGE=1 ./scripts/train.sh`
+   - Extra Axolotl args: `./scripts/train.sh --max_steps 200 --save_steps 100`
 
 ## Evaluate (text-to-SQL)
 - Default eval uses the merged Gemma run and `data/test.jsonl`:
