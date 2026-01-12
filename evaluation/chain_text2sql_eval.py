@@ -136,11 +136,17 @@ def build_sql_chain(chat: ChatHuggingFace, database: SQLDatabase):
 def evaluate(
     examples: Iterable[Example],
     chat: ChatHuggingFace,
+    output_path: Optional[Path] = None,
 ) -> None:
     total = 0
     success = 0
     fail = 0
     skip = 0
+
+    result_file = None
+    if output_path:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        result_file = output_path.open("w", encoding="utf-8")
 
     examples_list = list(examples)
     progress = tqdm(examples_list, desc="Evaluating", unit="q")
@@ -157,6 +163,20 @@ def evaluate(
             except Exception:  # noqa: BLE001
                 skip += 1
                 progress.set_postfix(success=success, fail=fail, skip=skip)
+                if result_file:
+                    result_file.write(
+                        json.dumps(
+                            {
+                                "db_id": example.db_id,
+                                "question": example.question,
+                                "ground_truth_sql": example.sql,
+                                "model_raw_output": None,
+                                "parsed_sql": None,
+                                "status": "skip",
+                            }
+                        )
+                        + "\n"
+                    )
                 continue
 
         sql_chain = build_sql_chain(chat, database)
@@ -169,15 +189,45 @@ def evaluate(
         if not parsed_sql:
             fail += 1
             progress.set_postfix(success=success, fail=fail, skip=skip)
+            if result_file:
+                result_file.write(
+                    json.dumps(
+                        {
+                            "db_id": example.db_id,
+                            "question": example.question,
+                            "ground_truth_sql": example.sql,
+                            "model_raw_output": raw_sql,
+                            "parsed_sql": None,
+                            "status": "fail",
+                        }
+                    )
+                    + "\n"
+                )
             continue
 
         try:
             database.run(parsed_sql)
             success += 1
+            status = "success"
         except Exception:  # noqa: BLE001
             fail += 1
+            status = "fail"
 
         progress.set_postfix(success=success, fail=fail, skip=skip)
+        if result_file:
+            result_file.write(
+                json.dumps(
+                    {
+                        "db_id": example.db_id,
+                        "question": example.question,
+                        "ground_truth_sql": example.sql,
+                        "model_raw_output": raw_sql,
+                        "parsed_sql": parsed_sql,
+                        "status": status,
+                    }
+                )
+                + "\n"
+            )
 
     attempted = total - skip
     success_rate = (success / attempted * 100) if attempted else 0
@@ -186,6 +236,8 @@ def evaluate(
     print(f"Skipped (ground truth failed): {skip}")
     print(f"Attempted: {attempted}")
     print(f"Execution Success: {success} ({success_rate:.2f}%)")
+    if result_file:
+        result_file.close()
 
 
 def parse_args() -> argparse.Namespace:
@@ -210,6 +262,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Limit number of examples to run (default: all)",
     )
+    parser.add_argument(
+        "--output-file",
+        type=Path,
+        default=None,
+        help="Write per-example results (JSONL) to this path",
+    )
     return parser.parse_args()
 
 
@@ -217,7 +275,7 @@ def main() -> None:
     args = parse_args()
     examples = load_examples(args.test_path, limit=args.limit)
     chat = build_chat_model(args.model_path)
-    evaluate(examples, chat)
+    evaluate(examples, chat, output_path=args.output_file)
 
 
 if __name__ == "__main__":
