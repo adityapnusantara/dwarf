@@ -69,6 +69,8 @@ class Example:
     db_id: str
     question: str
     sql: str
+    sql_complexity: str
+    question_style: str
 
 
 def load_examples(path: Path, limit: Optional[int] = None) -> List[Example]:
@@ -83,6 +85,8 @@ def load_examples(path: Path, limit: Optional[int] = None) -> List[Example]:
                     db_id=payload["db_id"],
                     question=payload["question"],
                     sql=payload["sql"],
+                    sql_complexity=payload.get("sql_complexity"),
+                    question_style=payload.get("question_style"),
                 )
             )
     return rows
@@ -170,6 +174,8 @@ def evaluate(
                                 "db_id": example.db_id,
                                 "question": example.question,
                                 "ground_truth_sql": example.sql,
+                                "sql_complexity": example.sql_complexity,
+                                "question_style": example.question_style,
                                 "model_raw_output": None,
                                 "parsed_sql": None,
                                 "status": "skip",
@@ -191,16 +197,18 @@ def evaluate(
             progress.set_postfix(success=success, fail=fail, skip=skip)
             if result_file:
                 result_file.write(
-                    json.dumps(
-                        {
-                            "db_id": example.db_id,
-                            "question": example.question,
-                            "ground_truth_sql": example.sql,
-                            "model_raw_output": raw_sql,
-                            "parsed_sql": None,
-                            "status": "fail",
-                        }
-                    )
+                        json.dumps(
+                            {
+                                "db_id": example.db_id,
+                                "question": example.question,
+                                "ground_truth_sql": example.sql,
+                                "sql_complexity": example.sql_complexity,
+                                "question_style": example.question_style,
+                                "model_raw_output": raw_sql,
+                                "parsed_sql": None,
+                                "status": "fail",
+                            }
+                        )
                     + "\n"
                 )
             continue
@@ -221,6 +229,8 @@ def evaluate(
                         "db_id": example.db_id,
                         "question": example.question,
                         "ground_truth_sql": example.sql,
+                        "sql_complexity": example.sql_complexity,
+                        "question_style": example.question_style,
                         "model_raw_output": raw_sql,
                         "parsed_sql": parsed_sql,
                         "status": status,
