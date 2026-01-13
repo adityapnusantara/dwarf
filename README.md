@@ -98,15 +98,14 @@ QLoRA fine-tune on synthetic Text-to-SQL, with a tidier layout.
   - `--limit`: cap number of questions to score (defaults to full file).
   Example output:
   ```
-  Evaluating: 100%|___________________| 10/10 [01:12<00:00,  7.29s/q, fail=8, skip=0, success=2]
+  Evaluating: 100%|___________________| 9622/9622 [01:12<00:00,  7.29s/q, fail=8374, skip=1, success=1247]
 
   === Summary ===
-  Total: 10
-  Skipped (ground truth failed): 0
-  Attempted: 2
-  Execution Success: 8 (80.00%)
+  Total: 9622
+  Skipped (ground truth failed): 1
+  Attempted: 9621
+  Execution Success: 1247 (12.96%)
   ```
 
 ## Outputs
 - Checkpoints/merged model: `outputs/`
-- Prepared dataset cache: `last_run_prepared/`
