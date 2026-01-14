@@ -38,7 +38,11 @@ QLoRA fine-tune on synthetic Text-to-SQL, with a tidier layout.
    git clone https://github.com/adityapnusantara/dwarf
    cd dwarf
    ```
-3) Make scripts executable, then launch training (train.sh will automatically run prepare_data.py to download and preprocess into the chat_template `messages` user/assistant format):
+3) Install Python deps:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4) Make scripts executable, then launch training (train.sh will automatically run prepare_data.py to download and preprocess into the chat_template `messages` user/assistant format):
    ```bash
    /bin/bash -lc "chmod +x ./scripts/train.sh ./scripts/prepare_data.py"
    CONFIG=./configs/gemma-3-1b-qlora.yml HF_TOKEN=<HF_TOKEN> ./scripts/train.sh
